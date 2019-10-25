@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, shrink-to-fit=no"
-      />
-      <meta name="theme-color" content="#000000" />
-      <link rel="stylesheet" type="text/css" href="/static/css/main.css">
-  </head>
-  <body>
-    <div class="container">
-      <div class="login-span"></div>
-      <div class="login-everything">
-        <p class="login-title main-title">An application (probably) wants to use your access token.</p>
-        <p class="disclaimer">Apps and scripts need this token to function.<br><br>Use this code for the application asking for it, or any other purposes you can think of. <strong>However, make sure this code does not get into the wrong hands — you could loose your account!</strong></p>
-        <div class="token-box">
-            {{ token }}
-        </div>
-      </div>
-    </div>
-  </body>
+	<head>
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<meta name="theme-color" content="#000000" />
+		<link rel="stylesheet" type="text/css" href="/static/css/main.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="login-span"></div>
+			<div class="login-everything">
+				<p class="login-title main-title">An application (probably) wants to use your access token.</p>
+				<p class="disclaimer">Apps and scripts need this token to function.<br><br>Use this code for the application asking for it, or any other purposes you can think of. <strong>However, make sure this code does not get into the wrong hands — you could loose your account!</strong></p>
+				<div class="token-box">
+					{{ token }}
+				</div>
+			</div>
+		</div>
+	</body>
 </html>

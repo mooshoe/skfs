@@ -87,7 +87,7 @@ router.get("/posts/:id", function(req, res) {
 	});
 });
 
-router.post("/post", protect, function(req, res) {
+router.post("/posts/create", protect, function(req, res) {
 	if (req.body.title == undefined)
 		res.status(400).json({"status": 400, "message": "You must suply a title."});
 	else if (req.body.content == undefined)
@@ -174,7 +174,7 @@ router.delete("/comment", protect, function(req, res) {
 	else if (comment.trim().length == 0)
 		res.status(404).json({"status": 403, "message": "Comment cannot be blank spaces..."});
 	else if (comment.user_id != req.account.id)
-		res.status(403).json({"status": 403, "message": "You do not have the right to delete this comment."});
+		res.status(403).json({"status": 403, "message": "You are not the owner of this comment."});
 	else {
 		db.prepare("DELETE FROM replies WHERE comment_id = ?").run(req.body.comment_id);
 		db.prepare("DELETE FROM comments WHERE id = ?").run(req.body.comment_id);
@@ -200,21 +200,21 @@ router.get("/users/:id", function(req, res) {
 		res.status(404).json({"status": 404, "message": "This user does not exist."});
 
 	var history = [
-		...db.prepare("SELECT * FROM posts WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+		...db.prepare("SELECT * FROM posts WHERE user_id = ? ORDER BY date DESC").all(req.params.id).map(obj => {
 			return {
 				type: 'POST',
 				post_id: obj.id,
 				date: obj.date
 			};
 		}),
-		...db.prepare("SELECT * FROM likes WHERE user_id = ? ORDER BY date DESC LIMIT 20"). all(req.params.id).map(obj => {
+		...db.prepare("SELECT * FROM likes WHERE user_id = ? ORDER BY date DESC"). all(req.params.id).map(obj => {
 			return {
 				type: 'LIKE',
 				post_id: obj.post_id,
 				date: obj.date
 			};
 		}),
-		...db.prepare("SELECT * FROM comments WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+		...db.prepare("SELECT * FROM comments WHERE user_id = ? ORDER BY date DESC").all(req.params.id).map(obj => {
 			return {
 				type: 'COMMENT',
 				post_id: obj.post_id,
@@ -222,7 +222,7 @@ router.get("/users/:id", function(req, res) {
 				date: obj.date
 			};
 		}),
-		...db.prepare("SELECT * FROM replies WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+		...db.prepare("SELECT * FROM replies WHERE user_id = ? ORDER BY date DESC").all(req.params.id).map(obj => {
 			const comment = db.prepare("SELECT * FROM comments WHERE id = ?").get(obj.comment_id);
 			return {
 				type: 'REPLY',
@@ -254,9 +254,15 @@ router.post("/information/token", protect, function(req, res) {
 	});
 });
 
+// Searching?!?!
 router.get("/timeline", function(req, res) {
+	if (!parseInt(req.query.limit) || req.query.limit > 50)
+		req.query.limit = 20;
+	if (!parseInt(req.query.offset))
+		req.query.offset = 0;
+
 	var response = [];
-	for (const post of db.prepare("SELECT * FROM posts ORDER BY date DESC LIMIT 20").all()) {
+	for (const post of db.prepare("SELECT * FROM posts ORDER BY date DESC LIMIT ? OFFSET ?").all(req.query.limit, req.query.offset)) {
 		const user = db.prepare("SELECT * FROM users WHERE id = ?").get(post.user_id);
 
 		var comments = [];
@@ -321,24 +327,29 @@ router.get("/timeline", function(req, res) {
 	res.status(200).json(response);
 });
 
-router.get("/information", function(req, res) {
-	links = [];
-	for (var thing of process.env.LINKS.split(";")) {
-		const ok = thing.split("|");
-		links.push({
-			name: ok[0],
-			url: ok[1]
-		})
-	}
-	res.status(200).json({
-		instanceName: process.env.INSTANCE_NAME,
-		links: links
-	});
-});
-
 module.exports = router;
 
-// notifications
-// get list of all users
+// set up api with postman: find stuff to patch
+//   - filter posts with /api/v1/timeline
+//   - possible urls to use query versus body
+// replace like with up/down votes possible
+// upload attachments
+// user avatars
+// revamp comments
+// - discord-like reactions, timestamps
+// - realtime?
+// - no replies?
+// return every time you add or delete something finished product
+// emojies for posts 
 
-// future for api: random ids for some things?
+// new login page + token page
+// account settings page
+// register page
+
+// publish
+
+// write web client
+//  - very CRUD, based on stibarc design
+
+// sqlite orm to use models, this is a full rewrite of api.js
+// notifications

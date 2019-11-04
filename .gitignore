@@ -1,17 +1,7 @@
 node_modules/
 .env
 server/public/images
-shrinkwrap.yaml
-server/api.js~
 client/build
 client/node_modules/
-server/public/index.html~
-package.json~
-server.js~
-client/*~
-client/public/index.html~
-client/public/index.js~
 .data
 server/build
-server/scss/main.scss~
-server/scss/stylesheet.css~
